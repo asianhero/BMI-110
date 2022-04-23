@@ -1,4 +1,7 @@
 # BMI-110
+"""
+I think all that is left that is needed is to update the dictionaries for billing but gonna sleep on so it's up for review along with other stuff i did
+"""
 import sys
 class Menu:
     def __init__(self, main_menu = 0):
@@ -77,7 +80,7 @@ class Doctor(Person):
                 print("Try again. ")
         
     def database_addition(self):
-        print("For the key identifier, we'll use the patient ID. ")
+        print("For the patient identifier, we'll use the patient ID. ")
         key_id = input("Patient ID: ")
         attributes_list = []
         self.first_name = input("First name: ")
@@ -103,7 +106,16 @@ class Doctor(Person):
         self.test = {'ABG': 500 , 'LFT': 400.2, 'COAGULATION': 600, 'CBC': 200, 'TSH': 100, 'CHOLESTEROL': 200}
         for key,value in self.test.items():
             print(key,value)
-            
+    """
+    for my own work later on so ignore
+    def lab_tests_addition(self):
+        print("What tests would you like to order? ")
+        test_key = input("Test: ")
+        test_list = []
+        self.cost = int(input("Cost: "))
+        test_list.append(self.test)
+        self.test[test_key] = test_list
+    """    
     def fetch_lab_tests(self,key):
         return self.test[key]
     
@@ -114,7 +126,7 @@ class Doctor(Person):
         w = sum(self.tests.values())
         print('\n'.join("{}: ${}".format(k,v) for k,v in self.tests.items()))
         print(f'The sum of tests ordered are ${w}')
-        self.dictionary_keys.update(self.tests)
+        #self.dictionary_keys.update(self.tests)
         
         
     def lab_tests_request(self):
@@ -136,6 +148,7 @@ class Doctor(Person):
                         if test in test_cost: 
                             self.cost = test
                             self.tests[test_request] = self.cost
+                            self.dictionary_keys.insert(len(self.dictionary_keys), self.tests)
                         else:
                             print("Test not found")
                     q.test_cost()
@@ -150,7 +163,6 @@ class Doctor(Person):
                 print("Try again")
     def doctor_menu(self):
         w = Doctor()
-        #w.doctor_login()
         main_menu = Menu()
         while True:
             try:
@@ -227,7 +239,8 @@ class Patient(Doctor):
                                 s = '*'
                                 print(f'Hello {patient_first_name[0] :{s}<{count}}' + f'{patient_last_name[0] :{s}<{counts}}')
                                 #w.test_cost()
-                                w.database()
+                                #w.database()
+                                w.fetch_database_value(result)
                             else:
                                 print("Not in database. ")
                         else:
