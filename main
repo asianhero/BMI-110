@@ -5,7 +5,6 @@ I think all that is left that is needed is to update the dictionaries for billin
 
 import sys
 from copy import copy
-from copy import deepcopy
 class Menu:
     def __init__(self, main_menu = 0):
         self.main_menu = main_menu
@@ -49,7 +48,7 @@ class Person:
               (self.last_name, self.first_name))
         
 class Doctor(Person):
-    def __init__(self, first_name = '', last_name = '', dictionary_keys = {}, test_list = {}, cost = 0, tests = {}, tabulation_total = [], q = [], total = 0, addition = ''):
+    def __init__(self, first_name = '', last_name = '', dictionary_keys = {}, test_list = {}, cost = 0, tests = {}, tabulation_total = [], total = 0, addition = []):
         super().__init__(first_name, last_name)
         self.first_name = first_name
         self.last_name = last_name
@@ -58,10 +57,8 @@ class Doctor(Person):
         self.cost = cost
         self.tests = tests
         self.tabulation_total = tabulation_total
-        self.q = q
         self.total = total
         self.addition = addition
-
     def doctor_login(self): 
         w = Doctor()
         print("Hello! Before going any further, provide"
@@ -90,6 +87,7 @@ class Doctor(Person):
         print("For the patient identifier, we'll use the patient ID. ")
         key_id = input("Patient ID: ")
         attributes_list = []
+        att_list = []
         self.first_name = input("First name: ")
         attributes_list.append(self.first_name)
         self.last_name = input("Last name: ")
@@ -100,10 +98,11 @@ class Doctor(Person):
         attributes_list.append(self.address)
         self.admit_date = input("Admit date: ")
         attributes_list.append(self.admit_date)
-        self.addition = input('Sum: ')
-        #attributes_list.append(self.addition)
+        self.key_two = input("Test ID: ")
+        self.addition = int(input("test cost: "))
+        att_list.append(self.addition)
         self.dictionary_keys[key_id] = attributes_list
-        self.dictionary_keys[self.addition] = {}
+        self.dictionary_keys[self.key_two] = att_list
 
     def database(self):
         for key,value in self.dictionary_keys.items():
@@ -116,35 +115,13 @@ class Doctor(Person):
         self.test_list = {'ABG': 500 , 'LFT': 400.2, 'COAGULATION': 600, 'CBC': 200, 'TSH': 100, 'CHOLESTEROL': 200}
         for key,value in self.test_list.items():
             print(key,value)
-    """
-    for my own work later on so ignore
-    def lab_tests_addition(self):
-        print("What tests would you like to order? ")
-        test_key = input("Test: ")
-        test_list = []
-        self.cost = int(input("Cost: "))
-        test_list.append(self.test)
-        self.test[test_key] = test_list
-    """    
+
     def fetch_lab_tests(self,key):
         return self.test_list[key]
     
     def fetch_lab_costs(self):
-        return self.test_list.values()
+        return self.test_list.values() 
     
-    def test_cost(self):
-        print('\n'.join("{}: ${}".format(k,v) for k,v in self.tests.items()))
-        self.q = deepcopy(self.tabulation_total)
-        for i in self.q:
-            if isinstance(i, list): 
-                self.total += sum(i)
-                print(self.total)
-            else:
-                self.total += i
-        self.dictionary_keys[self.addition] = self.total
-        print(self.dictionary_keys)
-        #print(f'The sum of tests ordered are ${self.q}')
-        
     def lab_tests_request(self):
         qt = Doctor()
         qt.database()
@@ -153,34 +130,41 @@ class Doctor(Person):
                 self.tests.clear()
                 doctor_request = input('Select the patient ID for the patient you wish to request tests: ')
                 name_request = input("What is the patient's first name? ")
+                number = input("Test number? ")
                 request = qt.fetch_database_value(doctor_request)
+                request_two = qt.fetch_database_value(number)
                 print(request)
                 qt.lab_tests()
-                if doctor_request in self.dictionary_keys.keys():
-                    if name_request in request:
-                        request_number = int(input("How many tests to request? "))
-                        for test in range(request_number):
-                            test_request = input('Which test to request? ').upper()
-                            test = qt.fetch_lab_tests(test_request)
-                            test_cost = qt.fetch_lab_costs()
-                            if test in test_cost: 
-                                self.cost = test
-                                self.tests[test_request] = self.cost
-                                #self.dictionary_keys['sum'] = 0
-                            else:
-                                print("Test not found")   
-                        request.append(self.tests.copy())
-                        self.tabulation_total.append(self.cost) 
-                        qt.test_cost()
-                    user_input = input("Back to Doctor Menu? ")
-                    if user_input == "y" or user_input == "Y":
-                        qt.doctor_menu()
-                    while user_input != 'y' and user_input != 'Y':
-                        user_input = input("That's not a valid choice. (Y)es or (N)o? ")
+                if number in self.dictionary_keys.keys():
+                    if doctor_request in self.dictionary_keys.keys():
+                        if name_request in request:
+                            request_number = int(input("How many tests to request? "))
+                            for test in range(request_number):
+                                test_request = input('Which test to request? ').upper()
+                                test = qt.fetch_lab_tests(test_request)
+                                test_cost = qt.fetch_lab_costs()
+                                if test in test_cost: 
+                                    self.cost = test
+                                    self.tests[test_request] = self.cost
+                                    request_two.append(self.cost)
+                                    self.total = sum(request_two)
+                                else:
+                                    print("Test not found")  
+                            print(self.total)
+                            request.append(self.tests.copy())
+                            self.tabulation_total.append(self.cost) 
+                            qt.test_cost()
+                        user_input = input("Back to test menu? ")
+                        if user_input == "y" or user_input == "Y":
+                            qt.lab_tests_request()
                         if user_input == "n" or user_input == "N":
-                            sys.exit()
-            except ValueError:
+                            qt.doctor_menu()
+            except ValueError:            
                 print("Try again")
+    def test_cost(self):
+        print('\n'.join("{}: ${}".format(k,v) for k,v in self.tests.items()))
+
+
     def doctor_menu(self):
         w = Doctor()
         main_menu = Menu()
@@ -211,7 +195,6 @@ class Doctor(Person):
                         else:
                             print("Here's a list: ")
                             w.database()
-                            #print(self.tests)
                     elif doctor_welcome == 3:
                         w.lab_tests_request()
                 except ValueError:
@@ -222,7 +205,7 @@ class Doctor(Person):
 class Patient(Doctor):
     def __init__(self, patient_id = 0, first_name = '', last_name = '', age = 0,
                  address = '', admit_date = ''):
-        super().__init__(first_name = '', last_name = '', dictionary_keys = {})
+        super().__init__(first_name = '', last_name = '', dictionary_keys = {}, test_list = {}, cost = 0, tests = {}, tabulation_total = [], total = 0, addition = [])
         self.patient_id = patient_id
         self.first_name = first_name
         self.last_name = last_name
@@ -248,7 +231,7 @@ class Patient(Doctor):
                         patient_first_name = input("What is your first name? ")
                         patient_last_name = input("What is your last name? ")
                         result = doctor.fetch_database_value(patient_id)
-                        if patient_id and patient_first_name in result:
+                        if patient_first_name in result:
                             if patient_last_name in result:
                                 for c in patient_first_name:
                                     if c in result[0]:
